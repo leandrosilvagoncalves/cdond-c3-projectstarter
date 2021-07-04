@@ -53,7 +53,7 @@ jobs:
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
-      - slack/status:
+      - slack/notify:
           fail_only: true
 
   build-backend:
