@@ -106,9 +106,9 @@ jobs:
       - run:
           name: Audit Front-End Dependencies
           command: |
-            cd frontend
             npm install oauth-sign
-            npm audit fix --audit-level=critical --force
+            cd frontend
+            npm audit --audit-level=critical
 
   scan-backend:
     docker:
@@ -119,9 +119,9 @@ jobs:
       - run:
           name: Audit Back-End Dependencies
           command: |
-            cd backend
             npm install oauth-sign
-            npm audit fix --audit-level=critical --force
+            cd backend
+            npm audit --audit-level=critical
 
 
 workflows:
