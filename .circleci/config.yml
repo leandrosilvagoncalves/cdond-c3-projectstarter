@@ -54,7 +54,8 @@ jobs:
           paths: [frontend/node_modules]
           key: frontend-build
       - slack/notify:
-          fail_only: true
+          event: fail
+          template: basic_fail_1
 
   build-backend:
     docker:
