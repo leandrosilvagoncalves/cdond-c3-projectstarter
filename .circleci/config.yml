@@ -102,7 +102,7 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - restore_cache:
-          keys: [backend-build]
+          keys: [frontend-build]
       - run:
           name: Audit Front-End Dependencies
           command: |
