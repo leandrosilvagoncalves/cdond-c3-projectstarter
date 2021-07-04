@@ -49,7 +49,6 @@ jobs:
             cd frontend
             npm install oauth-sign
             npm run build
-            return 1
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
@@ -132,7 +131,48 @@ jobs:
             npm install oauth-sign
             # npm audit --audit-level=critical
             npm audit fix --audit-level=critical --force
-      
+
+  deploy-infrastructure:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout # Checkout code from git
+      - run:
+          name: Install dependencies
+          command: |
+            yum install tar gzip -y
+      - run:
+          name: Ensure back-end infrastructure exists
+          command: |
+            aws cloudformation deploy \
+              --template-file .circleci/files/backend.yml \
+              --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  
+              --tags project=backend-tag
+            URLS=$(aws ec2 describe-instances --region us-east-1 --query "Reservations[*].Instances[*].PublicDnsName"  --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}"  --output text)
+            echo "URLS=$URLS" 
+            curl -H "Content-Type: text/plain" -H "token: ffbc6fec-2110-4209-8d2f-d9640b61e52c" --request PUT --data "$URLS" https://api.memstash.io/values/url_${CIRCLE_WORKFLOW_ID:0:7}  
+      - run:
+          name: Ensure front-end infrastructure exist
+          command: |
+               aws cloudformation deploy \
+              --template-file .circleci/files/frontend.yml \
+              --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  
+              --tags project=frontend-tag
+      - run:
+          name: Add back-end DNS name to ansible inventory
+          command: |
+            export backend_IP=$(aws ec2 describe-instances \
+              --query 'Reservations[*].Instances[*].PublicDnsName' \
+              --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --output text >> .circleci/ansible/inventory.txt)
+            cat ./.circleci/ansible/inventory.txt
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/.circleci/ansible/inventory.txt
+      # Here's where you will add some code to rollback on failure 
 
 
 workflows:
@@ -150,3 +190,8 @@ workflows:
          requires: [build-backend]
       - scan-frontend:
          requires: [build-frontend]
+      - deploy-infrastructure:
+         requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+         filters:
+           branches:
+             only: [master]
