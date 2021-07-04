@@ -113,7 +113,7 @@ jobs:
           name: Audit Front-End Dependencies
           command: |
             cd frontend
-            npm install oauth-sign
+            npm i
             npm audit --audit-level=critical
             # npm audit fix --audit-level=critical --force
 
@@ -128,8 +128,8 @@ jobs:
           name: Audit Back-End Dependencies
           command: |
             cd backend
-            npm install oauth-sign
-            npm audit --audit-level=critical
+            npm i
+            npm audit fix --audit-level=critical
             # npm audit fix --audit-level=critical --force
 
   deploy-infrastructure:
