@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs:
+  slack: circleci/slack@4.4.2
+
 commands:
   destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
@@ -46,10 +49,12 @@ jobs:
             cd frontend
             npm install oauth-sign
             npm run build
-            
+            return 1
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
+      - slack/status:
+          fail_only: true
 
   build-backend:
     docker:
@@ -126,6 +131,7 @@ jobs:
             npm install oauth-sign
             # npm audit --audit-level=critical
             npm audit fix --audit-level=critical --force
+      
 
 
 workflows:
