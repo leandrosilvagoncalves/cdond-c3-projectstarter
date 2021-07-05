@@ -254,7 +254,7 @@ jobs:
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
-          
+
 workflows:
   default:
     jobs:
@@ -271,7 +271,7 @@ workflows:
       - scan-frontend:
          requires: [build-frontend]
       - deploy-infrastructure:
-         requires: [test-frontend, test-backend, scan-frontend, scan-backend]+
+         requires: [test-frontend, test-backend, scan-frontend, scan-backend]
          filters:
            branches:
              only: master
