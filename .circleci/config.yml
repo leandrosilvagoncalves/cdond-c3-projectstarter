@@ -222,7 +222,7 @@ jobs:
             sudo apt-get -qq install awscli
       - run:
           name: Adding .env data
-          comand: |
+          command: |
             touch backend/.env
             echo NODE_ENV=$ENVIRONMENT >> "backend/.env"
             echo VERSION=${CIRCLE_WORKFLOW_ID} >> "backend/.env"
