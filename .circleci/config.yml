@@ -151,7 +151,7 @@ jobs:
               --parameter-overrides ID=${CIRCLE_WORKFLOW_ID:0:7}  
             URLS=$(aws ec2 describe-instances --region ${AWS_DEFAULT_REGION} --query "Reservations[*].Instances[*].PublicDnsName" --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" --output text)
             echo "URLS=$URLS" 
-            curl -H "Content-Type: text/plain" -H "token: ${CIRCLE_WORKFLOW_ID}" --request PUT --data "$URLS" https://api.memstash.io/values/url_${CIRCLE_WORKFLOW_ID:0:7}   
+            curl -H "Content-Type: text/plain" -H "token: 5c64246e-cafb-4e5b-a96b-23b44084375c" --request PUT --data "$URLS" https://api.memstash.io/values/url_${CIRCLE_WORKFLOW_ID:0:7}   
             
       - run:
           name: Ensure front-end infrastructure exist
@@ -194,7 +194,7 @@ jobs:
           command: |
             cd .circleci/ansible
             echo "[web]" >> inventory.txt
-            URLS=$(curl -H "token: ${CIRCLE_WORKFLOW_ID}" --request GET https://api.memstash.io/values/url_${CIRCLE_WORKFLOW_ID:0:7})
+            URLS=$(curl -H "token: 5c64246e-cafb-4e5b-a96b-23b44084375c" --request GET https://api.memstash.io/values/url_${CIRCLE_WORKFLOW_ID:0:7})
             echo $URLS >> inventory.txt
             cat inventory.txt
       - run:
@@ -245,16 +245,47 @@ jobs:
             npm run build
             npm run migrations > migrations_log.txt
             cat migrations_log.txt
-            ls -la
-      # - run:
-      #     name: Send migration results to memstash
-      #     command: |
-      #       # Your code here
-      #       exit 1
+      - run:
+          name: Send migration results to memstash
+          command: |
+            if grep -q "has been executed successfully" migrations_log.txt; then 
+              curl -H "Content-Type: text/plain" -H "token: 5ac96d73-e853-4146-9e18-b99cac548fbf" --request PUT --data "1" https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID:0:7}
+            else
+              curl -H "Content-Type: text/plain" -H "token: 5ac96d73-e853-4146-9e18-b99cac548fbf" --request PUT --data "0" https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID:0:7}
+            fi
+            RESULT=$(curl -H "token: 5ac96d73-e853-4146-9e18-b99cac548fbf" --request GET https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID:0:7})
+            echo "${RESULT}" 
      # Here's where you will add some code to rollback on failure    
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
+
+  deploy-frontend:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            curl -sL https://rpm.nodesource.com/setup_lts.x | bash - #
+            yum -y install tar gzip nodejs
+
+      - run:
+          name: Get backend url
+          command: |
+            BACKEND_IP=$(curl -H "token: 5c64246e-cafb-4e5b-a96b-23b44084375c" --request GET https://api.memstash.io/values/url_${CIRCLE_WORKFLOW_ID:0:7})
+            export API_URL="http://${BACKEND_IP}:3030"
+            echo "${API_URL}"
+      - run:
+          name: Deploy frontend objects
+          command: |
+            cd frontend
+            npm install
+            npm run build
+            aws s3 cp ./dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+      # Here's where you will add some code to rollback on failure      
+                    
 
 workflows:
   default:
@@ -281,3 +312,5 @@ workflows:
           requires: [deploy-infrastructure]
       - run-migrations:
           requires: [configure-infrastructure]
+      - deploy-frontend:
+          requires: [run-migrations]
