@@ -11,12 +11,44 @@
     src: /root/project/backend
     dest: /home/ubuntu
 
-- name: Install Node modules
-  shell: |
-    cd /home/ubuntu/backend
-    npm install
-    npm run build
+- name: "update apt packages."
+  become: yes
+  apt:
+    update_cache: yes
+
+- name: "upgrade packages"
+  become: yes
+  apt:
+    upgrade: yes
+
+- name: remove dependencies that are no longer required
+  become: yes
+  apt:
+    autoremove: yes
+
+- name: "install dependencies."
+  become: yes
+  apt:
+    name: ["nodejs", "npm"]
+    state: latest
+    update_cache: yes
+
     
+- name: "install pm2"
+  become: true
+  npm:
+    name: pm2
+    global: yes
+    production: yes
+    state: present
+
+
+# - name: Install Node modules
+#   shell: |
+#     cd /home/ubuntu/backend
+#     npm install
+#     npm run build
+
     
 # - name: Building backend service
 #   shell: |
@@ -24,11 +56,12 @@
 #     npm run build
     
         
-# - name: Executing node
-#   become: true
-#   shell: |
-#     cd /home/ubuntu/backend
-#     pm2 start npm --name backend -- start
+- name: Executing node
+  become: true
+  shell: |
+    cd /home/ubuntu/backend
+    pm2 start npm --name backend -- start
+    pm2 ls
     
 # - name: Building node service
 #   shell: |
