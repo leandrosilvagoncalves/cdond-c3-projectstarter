@@ -17,16 +17,23 @@
       npm install
 
   - name: Building backend
-    shell: 
-      chdir: ~/backend
-      cmd: npm run build
-
-  - name: Run app
-    shell: 
-      chdir: ~/backend
-      cmd: pm2 start ./dist/main.js
-
-  - name: Configure pm2
     shell: |
-      eval $(pm2 startup | tail -1)\n\
-      pm2 save
+      cd /home/ubuntu/backend
+      npm i
+      npm audit fix --audit-level=critical --force
+      npm run build
+
+  - name: Start pm2 service
+    shell: |
+      cd /home/ubuntu/backend
+      pm2 start npm --name backend -- start
+      
+  # - name: Run app
+  #   shell: 
+  #     chdir: ~/backend
+  #     cmd: pm2 start ./dist/main.js
+
+  # - name: Configure pm2
+  #   shell: |
+  #     eval $(pm2 startup | tail -1)\n\
+  #     pm2 save
