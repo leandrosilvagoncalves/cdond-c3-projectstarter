@@ -1,8 +1,20 @@
 ---
+  - name: "install dependencies."
+    become: true
+    apt:
+      name: "tar"
+      state: latest
+      update_cache: yes
+
   - name: Copy backend dist files to remote server
     copy:
       src: /root/project/backend
       dest: /home/ubuntu
+  
+  - name: Install Node modules
+    shell: |
+      cd /home/ubuntu/backend
+      npm install
 
   - name: Building backend
     shell: 

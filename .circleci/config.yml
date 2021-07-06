@@ -294,7 +294,7 @@ jobs:
       - checkout
       # attach workspace
       - attach_workspace:
-          at: /root/project
+          at: ~/
       # Add ssh keys with fingerprint
       - add_ssh_keys:
           fingerprints: ["71:95:f4:44:03:5a:14:78:08:45:93:7b:e7:9e:86:94"]
@@ -327,6 +327,11 @@ jobs:
             echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "backend/.env"
             cd backend
             cat .env
+       - run:
+          name: Compress Backend
+          command: |
+            tar -C backend -czvf artifact.tar.gz .
+            ls -la
       - run:
           name: Deploy backend
           command: |
