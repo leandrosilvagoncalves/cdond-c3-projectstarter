@@ -327,7 +327,8 @@ jobs:
             echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "backend/.env"
             cd backend
             cat .env
-       - run:
+
+      - run:
           name: Compress Backend
           command: |
             tar -C backend -czvf artifact.tar.gz .
