@@ -1,30 +1,30 @@
 ---
-- name: "install dependencies."
-  become: true
-  apt:
-    name: "tar"
-    state: latest
-    update_cache: yes
+# - name: "install dependencies."
+#   become: true
+#   apt:
+#     name: "tar"
+#     state: latest
+#     update_cache: yes
 
-- name: Copy backend dist files to remote server
-  copy:
-    src: /root/project/backend
-    dest: /home/ubuntu
+# - name: Copy backend dist files to remote server
+#   copy:
+#     src: /root/project/backend
+#     dest: /home/ubuntu
 
-- name: "update apt packages."
-  become: yes
-  apt:
-    update_cache: yes
+# - name: "update apt packages."
+#   become: yes
+#   apt:
+#     update_cache: yes
 
-- name: "upgrade packages"
-  become: yes
-  apt:
-    upgrade: yes
+# - name: "upgrade packages"
+#   become: yes
+#   apt:
+#     upgrade: yes
 
-- name: remove dependencies that are no longer required
-  become: yes
-  apt:
-    autoremove: yes
+# - name: remove dependencies that are no longer required
+#   become: yes
+#   apt:
+#     autoremove: yes
 
 - name: "install dependencies."
   become: yes
@@ -50,18 +50,28 @@
 #     npm run build
 
     
-# - name: Building backend service
+- name: Building backend service
+  shell:
+    cmd: npm run build
+    chdir: ~/backend
+ 
+- name: Run app
+    shell:
+      chdir: ~/backend
+      cmd: |
+        pm2 start ./dist/main.js
+ 
+- name: Configure pm2
+    shell: |
+      eval $(pm2 startup | tail -1)
+      pm2 save
+        
+# - name: Executing node
+#   become: true
 #   shell: |
 #     cd /home/ubuntu/backend
-#     npm run build
-    
-        
-- name: Executing node
-  become: true
-  shell: |
-    cd /home/ubuntu/backend
-    pm2 start npm --name backend -- start
-    pm2 ls
+#     pm2 start npm --name backend -- start
+#     pm2 ls
     
 # - name: Building node service
 #   shell: |
@@ -69,8 +79,8 @@
 #     npm run build
 #     npm run start:prod
     
-- name: start pm2 for dist/main.js
-  become: no
-  shell: pm2 start main.js
-  args:
-    chdir: /home/ubuntu/backend/dist
+# - name: start pm2 for dist/main.js
+#   become: no
+#   shell: pm2 start main.js
+#   args:
+#     chdir: /home/ubuntu/backend/dist
