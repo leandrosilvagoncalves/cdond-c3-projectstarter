@@ -362,10 +362,10 @@ jobs:
                   --query 'Reservations[*].Instances[*].PublicDnsName' \
                   --output text)
             echo ${BACKEND_URL}
-            export URL="http://$BACKEND_URL:3030/api/status"
-            echo $URL
-            curl $URL
-            if curl -s ${EC2_URL} | grep "ok"
+            export ENDPOINT_URL="http://$BACKEND_URL:3030/api/status"
+            echo $ENDPOINT_URL
+            curl $ENDPOINT_URL
+            if curl -s ${ENDPOINT_URL | grep "ok"
             then
               exit 0
             else
@@ -374,7 +374,7 @@ jobs:
       - run:
           name: Frontend smoke test.
           command: |
-            frontend_url="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-us-east-2.amazonaws.com/index.html#/employees"
+            frontend_url="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-us-east-2.amazonaws.com"
             if curl -s ${frontend_url} | grep "Welcome"
             then
               return 0
