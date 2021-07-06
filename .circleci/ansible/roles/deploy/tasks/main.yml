@@ -1,33 +1,20 @@
---- 
-- 
-  apt: 
-    name: 
-      - nodejs
-      - npm
-    state: latest
-    update_cache: true
-  become: true
-  name: "install dependencies."
-- 
-  become: true
-  name: "install pm2"
-  npm: 
-    global: true
-    name: pm2
-    production: true
-    state: present
-- 
-  name: "Building backend service"
-  shell: 
-    chdir: ~/backend
-    cmd: "npm run build"
-- 
-  name: "Run app"
-  shell: 
-    chdir: ~/backend
-    cmd: "pm2 start ./dist/main.js\n"
-- 
-  name: "Configure pm2"
-  shell: "eval $(pm2 startup | tail -1)\n\
-      pm2 save\n\
-      \x20   \n"
+---
+  - name: Copy backend dist files to remote server
+    copy:
+      src: /root/project/backend
+      dest: /home/ubuntu
+
+  - name: Building backend
+    shell: 
+      chdir: ~/backend
+      cmd: npm run build
+
+  - name: Run app
+    shell: 
+      chdir: ~/backend
+      cmd: pm2 start ./dist/main.js
+
+  - name: Configure pm2
+    shell: |
+      eval $(pm2 startup | tail -1)\n\
+      pm2 save
