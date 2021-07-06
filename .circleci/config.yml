@@ -365,7 +365,7 @@ jobs:
             export ENDPOINT_URL="http://$BACKEND_URL:3030/api/status"
             echo $ENDPOINT_URL
             curl $ENDPOINT_URL
-            if curl -s ${ENDPOINT_URL | grep "ok"
+            if curl -s ${ENDPOINT_URL} | grep "ok"
             then
               exit 0
             else
