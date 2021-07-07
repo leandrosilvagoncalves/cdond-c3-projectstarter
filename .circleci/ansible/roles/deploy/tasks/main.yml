@@ -26,13 +26,3 @@
     shell: |
       cd /home/ubuntu/backend
       pm2 start npm --name backend -- start
-
-  # - name: Run app
-  #   shell: 
-  #     chdir: ~/backend
-  #     cmd: pm2 start ./dist/main.js
-
-  # - name: Configure pm2
-  #   shell: |
-  #     eval $(pm2 startup | tail -1)\n\
-  #     pm2 save
