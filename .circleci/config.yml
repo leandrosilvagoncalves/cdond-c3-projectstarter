@@ -31,6 +31,7 @@ commands:
       - run:
           name: Revert migrations
           # Add when this will run
+          when: on_fail
           command: |
             # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
             SUCCESS=$(curl -H "token: 5ac96d73-e853-4146-9e18-b99cac548fbf" --request GET https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID:0:7})
@@ -375,11 +376,10 @@ jobs:
             if curl -s ${ENDPOINT_URL} | grep "ok"
             then
               echo "Success"
-              exit 0
+              exit 1
             else
               echo "Failed"
               exit 1
-            return 1
             fi  
       - run:
           name: Frontend smoke test.
