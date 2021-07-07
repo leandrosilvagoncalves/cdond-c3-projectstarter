@@ -377,7 +377,7 @@ jobs:
             if curl -s ${ENDPOINT_URL} | grep "ok"
             then
               echo "Success"
-              exit 1
+              exit 0
             else
               echo "Failed"
               exit 1
@@ -395,8 +395,37 @@ jobs:
             fi
       # Here's where you will add some code to rollback on failure
       - revert-migrations
-          
       - destroy-environment
+
+  cloudfront-update:
+    docker:
+      # Docker image here that supports AWS CLI
+      - image: amazon/aws-cli
+    steps:
+      # Checkout code from git
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            yum -y install tar gzip
+      - run:
+          name: Retrieve previous stack workflow ID 
+          command: |
+            aws cloudformation \
+            list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
+            --region us-east-1 --no-paginate --output text >> ./.circleci/previousworkflowid.txt
+      - run:
+          name: Update cloudfront distribution
+          command: |
+            aws cloudformation \
+            update-stack --use-previous-template --stack-name udapeople-cloudfront \
+            --parameters ParameterKey=WorkflowID,ParameterValue=${CIRCLE_WORKFLOW_ID:0:7},UsePreviousValue=false
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/.circleci/previousworkflowid.txt  
+
+      # Here's where you will add some code to rollback on failure
                              
 
 workflows:
