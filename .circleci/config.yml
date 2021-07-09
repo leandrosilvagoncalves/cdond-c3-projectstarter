@@ -123,8 +123,8 @@ jobs:
           command: |
             cd frontend
             npm i
-            npm audit fix --audit-level=critical
-            # npm audit fix --audit-level=critical --force
+            #npm audit fix --audit-level=critical
+            npm audit fix --audit-level=critical --force
 
   scan-backend:
     docker:
@@ -138,8 +138,8 @@ jobs:
           command: |
             cd backend
             npm i
-            npm audit fix --audit-level=critical
-            # npm audit fix --audit-level=critical --force
+            #npm audit fix --audit-level=critical
+            npm audit fix --audit-level=critical --force
 
   deploy-infrastructure:
     docker:
@@ -315,6 +315,13 @@ jobs:
             apk add --no-cache --upgrade bash
             pip install awscli
       - run:
+          name: Build 
+          command: |
+            # your code here
+            cd backend
+            npm i
+            npm run build
+      - run:
           name: Setup Inventory file
           command: |
             cd .circleci/ansible
@@ -322,24 +329,6 @@ jobs:
             URLS=$(curl -H "token: 5c64246e-cafb-4e5b-a96b-23b44084375c" --request GET https://api.memstash.io/values/url_${CIRCLE_WORKFLOW_ID:0:7})
             echo $URLS >> inventory.txt
             cat inventory.txt
-      # - run:
-      #     name: Adding .env data
-      #     command: |
-      #       touch backend/.env
-      #       echo NODE_ENV=$ENVIRONMENT >> "backend/.env"
-      #       echo VERSION=${CIRCLE_WORKFLOW_ID:0:7} >> "backend/.env"
-      #       echo TYPEORM_CONNECTION=$TYPEORM_CONNECTION >> "backend/.env"
-      #       echo TYPEORM_MIGRATIONS_DIR=$TYPEORM_MIGRATIONS_DIR >> "backend/.env"
-      #       echo TYPEORM_ENTITIES=.$TYPEORM_ENTITIES >> "backend/.env"
-      #       echo TYPEORM_MIGRATIONS=$TYPEORM_MIGRATIONS >> "backend/.env"
-      #       echo TYPEORM_HOST=$TYPEORM_HOST >> "backend/.env"
-      #       echo TYPEORM_PORT=$TYPEORM_PORT >> "backend/.env"
-      #       echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "backend/.env"
-      #       echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "backend/.env"
-      #       echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "backend/.env"
-      #       cd backend
-      #       cat .env
-
       - run:
           name: Compress Backend
           command: |
