@@ -77,7 +77,6 @@ jobs:
           command: |
             cd backend
             npm install oauth-sign
-            npm audit fix --force     
             npm run build
 
       - save_cache:
