@@ -25,8 +25,8 @@
 
   - name: run migrations again
     shell: |
-    cd /home/ubuntu/backend
-    npm run migrations
+      cd /home/ubuntu/backend
+      npm run migrations
 
   - name: Start pm2 service
     shell: |
