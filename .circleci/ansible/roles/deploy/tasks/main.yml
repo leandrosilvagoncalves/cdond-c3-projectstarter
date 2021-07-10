@@ -1,15 +1,58 @@
 ---
+  - name: "upgrade packages."
+    become: true
+    apt:
+    upgrade: "yes"
+
   - name: "install dependencies"
     become: true
     apt:
-      name: "tar"
-      state: latest
+      name: ["nodejs", "npm", "tar"]
       update_cache: yes
+  
+  - name: "install pm2"
+    become: true
+    npm:
+      name: pm2
+      global: yes
+      production: yes
+      state: present
 
-  - name: Copy backend dist files to remote server
+  - name: "copy backend file"
+    become: true
     copy:
-      src: /root/project/backend
-      dest: /home/ubuntu
+      src: /root/project/backend.tar.gz
+      dest: /root
+      force: no
+
+  - name: "install package dependencies"
+    become: true
+    shell: |
+      cd /root
+      tar -xzvf backend.tar.gz
+
+  - name: "install npm packages"
+    become: true
+    command: npm install
+    args:
+      chdir: /root/backend
+
+  - name: "compile npm packages"
+    become: true
+    command: npm run build
+    args:
+      chdir: /root/backend
+
+  - name: "start server"
+    become: true
+    command: pm2 start npm -- run start
+    args:
+      chdir: /root/backend/dist
+
+  # - name: Copy backend dist files to remote server
+  #   copy:
+  #     src: /root/project/backend
+  #     dest: /home/ubuntu
   
   # - name: Install Node modules
   #   shell: |
@@ -22,23 +65,23 @@
   #     npm i
   #     npm run build
 
-  - name: Start pm2 service
-    shell: |
-      cd /home/ubuntu/backend
-      pm2 start npm --name backend -- start
+  # - name: Start pm2 service
+  #   shell: |
+  #     cd /home/ubuntu/backend
+  #     pm2 start npm --name backend -- start
   # - name: "Start pm2 server"
   #   become: true
   #   command: pm2 start -f ./main.js
   #   args:
   #     chdir: /home/ubuntu/backend/dist
-    environment:
-      ENVIRONMENT: production
-      TYPEORM_CONNECTION: "{{ lookup('env', 'TYPEORM_CONNECTION') }}"
-      TYPEORM_MIGRATIONS_DIR: "./migrations"
-      TYPEORM_MIGRATIONS: "./migrations/*.js"
-      TYPEORM_ENTITIES: "./modules/domain/**/*.entity.js"
-      TYPEORM_HOST: "{{ lookup('env', 'TYPEORM_HOST') }}"
-      TYPEORM_PORT: "{{ lookup('env', 'TYPEORM_PORT') }}"
-      TYPEORM_USERNAME: "{{ lookup('env', 'TYPEORM_USERNAME') }}"
-      TYPEORM_PASSWORD: "{{ lookup('env', 'TYPEORM_PASSWORD') }}"
-      TYPEORM_DATABASE: "{{ lookup('env', 'TYPEORM_DATABASE') }}"
+    # environment:
+    #   ENVIRONMENT: production
+    #   TYPEORM_CONNECTION: "{{ lookup('env', 'TYPEORM_CONNECTION') }}"
+    #   TYPEORM_MIGRATIONS_DIR: "./migrations"
+    #   TYPEORM_MIGRATIONS: "./migrations/*.js"
+    #   TYPEORM_ENTITIES: "./modules/domain/**/*.entity.js"
+    #   TYPEORM_HOST: "{{ lookup('env', 'TYPEORM_HOST') }}"
+    #   TYPEORM_PORT: "{{ lookup('env', 'TYPEORM_PORT') }}"
+    #   TYPEORM_USERNAME: "{{ lookup('env', 'TYPEORM_USERNAME') }}"
+    #   TYPEORM_PASSWORD: "{{ lookup('env', 'TYPEORM_PASSWORD') }}"
+    #   TYPEORM_DATABASE: "{{ lookup('env', 'TYPEORM_DATABASE') }}"
