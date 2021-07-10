@@ -326,8 +326,7 @@ jobs:
           name: Adding .env data
           command: |
             touch backend/.env
-            echo NODE_ENV=$ENVIRONMENT >> "backend/.env"
-            echo VERSION=${CIRCLE_WORKFLOW_ID:0:7} >> "backend/.env"
+            echo NODE_ENV=production >> "backend/.env"
             echo TYPEORM_CONNECTION=$TYPEORM_CONNECTION >> "backend/.env"
             echo TYPEORM_MIGRATIONS_DIR=$TYPEORM_MIGRATIONS_DIR >> "backend/.env"
             echo TYPEORM_ENTITIES=.$TYPEORM_ENTITIES >> "backend/.env"
