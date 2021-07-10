@@ -6,11 +6,27 @@
       state: latest
       update_cache: yes
 
-  - name: Copy backend dist files to remote server
+  # - name: Copy backend dist files to remote server
+  #   copy:
+  #     src: /root/project/backend
+  #     dest: /home/ubuntu
+  - name: "copy folder "
+    become: true
     copy:
-      src: /root/project/backend
-      dest: /home/ubuntu
-  
+      #src: /root/project/backend/dist
+      src: /root/project/artifact.tar.gz
+      #src: /root/project/
+      dest: /home/ubuntu/
+
+- name: "untar folder "
+  become: true
+  ansible.builtin.unarchive:
+    #src: /root/project/backend/dist
+    src: /home/ubuntu/artifact.tar.gz
+    #src: /root/project/
+    dest: /home/ubuntu/backend/
+    remote_src: yes
+
   - name: Install Node modules
     shell: |
       cd /home/ubuntu/backend
