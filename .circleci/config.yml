@@ -56,11 +56,11 @@ jobs:
           name: Build front-end
           command: |
             cd frontend
-            npm install oauth-sign
-            npm update
-            npm install npm@latest -g
-            npm install webpack
-            npm run build
+            sudo npm install oauth-sign
+            sudo npm update
+            sudo npm install npm@latest -g
+            sudo npm install webpack
+            sudo npm run build
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
@@ -80,7 +80,7 @@ jobs:
           command: |
             cd backend
             npm install oauth-sign
-            udo npm install npm@latest -g
+            sudo npm install npm@latest -g
             sudo npm i --save-dev standard-version
             npm run build
 
