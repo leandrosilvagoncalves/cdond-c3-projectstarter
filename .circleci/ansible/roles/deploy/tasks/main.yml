@@ -18,14 +18,14 @@
       #src: /root/project/
       dest: /home/ubuntu/
 
-- name: "untar folder "
-  become: true
-  ansible.builtin.unarchive:
-    #src: /root/project/backend/dist
-    src: /home/ubuntu/artifact.tar.gz
-    #src: /root/project/
-    dest: /home/ubuntu/backend/
-    remote_src: yes
+  - name: "untar folder "
+    become: true
+    ansible.builtin.unarchive:
+      #src: /root/project/backend/dist
+      src: /home/ubuntu/artifact.tar.gz
+      #src: /root/project/
+      dest: /home/ubuntu/backend/
+      remote_src: yes
 
   - name: Install Node modules
     shell: |
