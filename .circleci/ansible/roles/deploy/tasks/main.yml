@@ -6,6 +6,13 @@
       state: latest
       update_cache: yes
 
+  - name: Create a directory if it does not exist
+    become: true
+    ansible.builtin.file:
+    path: /home/ubuntu/backend
+    state: directory
+    mode: '0755'
+
   # - name: Copy backend dist files to remote server
   #   copy:
   #     src: /root/project/backend
