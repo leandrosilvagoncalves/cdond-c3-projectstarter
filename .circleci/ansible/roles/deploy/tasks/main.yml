@@ -6,18 +6,12 @@
       state: latest
       update_cache: yes
 
-  - name: Create a directory if it does not exist
-    become: true
-    ansible.builtin.file:
-      path: /home/ubuntu/backend
-      state: directory
-      mode: '0755'
 
   # - name: Copy backend dist files to remote server
   #   copy:
   #     src: /root/project/backend
   #     dest: /home/ubuntu
-  - name: "copy folder "
+  - name: "copy tar file "
     become: true
     copy:
       #src: /root/project/backend/dist
@@ -25,24 +19,20 @@
       #src: /root/project/
       dest: /home/ubuntu/
 
-  - name: "untar folder "
+  - name: "Untar backend folder"
     become: true
-    ansible.builtin.unarchive:
-      #src: /root/project/backend/dist
-      src: /home/ubuntu/artifact.tar.gz
-      #src: /root/project/
-      dest: /home/ubuntu/backend/
-      remote_src: yes
+    shell: |
+      cd /home/ubuntu/
+      tar -xzvf artifact.tar.gz
 
   - name: Install Node modules
     shell: |
       cd /home/ubuntu/backend
-      npm install
+      npm i
 
   - name: Building backend
     shell: |
       cd /home/ubuntu/backend
-      npm i
       npm run build
 
   - name: Start pm2 service

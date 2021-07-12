@@ -343,7 +343,7 @@ jobs:
       - run:
           name: Compress Backend
           command: |
-            tar -C backend -czvf artifact.tar.gz .
+            tar -czvf artifact.tar.gz backend
             pwd
             ls -la
       - run:
