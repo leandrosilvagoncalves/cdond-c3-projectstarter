@@ -6,11 +6,6 @@
       state: latest
       update_cache: yes
 
-
-  # - name: Copy backend dist files to remote server
-  #   copy:
-  #     src: /root/project/backend
-  #     dest: /home/ubuntu
   - name: "copy tar file "
     become: true
     copy:
