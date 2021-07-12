@@ -24,18 +24,22 @@
     shell: |
       cd /home/ubuntu/
       tar -xzvf artifact.tar.gz
+      ls -lha
 
   - name: Install Node modules
+    become: true
     shell: |
       cd /home/ubuntu/backend
       npm i
 
   - name: Building backend
+    become: true
     shell: |
       cd /home/ubuntu/backend
       npm run build
 
   - name: Start pm2 service
+    become: true
     shell: |
       cd /home/ubuntu/backend
       pm2 start npm --name backend -- start
